@@ -1,0 +1,21 @@
+{
+  "name": "newfold/secure-passwords",
+  "description": "Stuff",
+  "type": "library",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Jonathan Desrosiers",
+      "email": "jonathan.desrosiers@newfold.com"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "bootstrap.php"
+    ]
+  },
+	"require-dev": {
+		"wp-phpunit/wp-phpunit": "^5.9",
+		"yoast/phpunit-polyfills": "^1.0"
+	}
+}
