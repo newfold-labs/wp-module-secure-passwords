@@ -1,21 +1,21 @@
 {
-    "name": "secure-passwords",
-    "description": "Stuff",
-    "license": "GPL-2.0-or-later",
-    "private": true,
-    "author": {
-        "name": "Jonathan Desrosiers",
-        "email": "jonathan.desrosiers@newfold.com"
-    },
-  "devDependencies": {
-    "@testing-library/cypress": "^8.0.2",
-      "@wordpress/env": "^4.2.1",
-    "axe-core": "^4.4.1",
-    "cypress": "^9.4.1",
-    "cypress-axe": "^0.14.0"
-  },
-    "scripts": {
-        "test:e2e": "npx cypress run",
-        "test:unit": "npx wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/secure-passwords/phpunit.xml --verbose'"
-    }
+	"name": "secure-passwords",
+	"description": "Stuff",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"author": {
+		"name": "Jonathan Desrosiers",
+		"email": "jonathan.desrosiers@newfold.com"
+	},
+	"devDependencies": {
+		"@testing-library/cypress": "^8.0.2",
+		"@wordpress/env": "^4.2.1",
+		"axe-core": "^4.4.1",
+		"cypress": "^9.4.1",
+		"cypress-axe": "^0.14.0"
+	},
+	"scripts": {
+		"test:e2e": "npx cypress run",
+		"test:unit": "npx wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/secure-passwords/phpunit.xml --verbose'"
+	}
 }
