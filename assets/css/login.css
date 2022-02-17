@@ -1,0 +1,19 @@
+.login-action-sp_insecure_password #login {
+	width: 60vw;
+	max-width: 650px;
+	margin-top: -2vh;
+}
+
+.login .sp-insecure-password-screen .submit {
+	text-align: center;
+}
+
+@media screen and (max-width: 782px) {
+	.login-action-insecure_password #login {
+		box-sizing: border-box;
+		margin-top: 0;
+		padding-left: 4vw;
+		padding-right: 4vw;
+		width: 100vw;
+	}
+}

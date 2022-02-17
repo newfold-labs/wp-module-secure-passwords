@@ -1,4 +1,9 @@
 <?php
+/**
+ * Secure Passwords module.
+ *
+ * @package Newfold\Secure_Passwords
+ */
 
 if ( function_exists( 'add_action' ) ) {
 	add_action( 'plugins_loaded', 'newfold_module_register_secure_passwords' );
