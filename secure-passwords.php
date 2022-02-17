@@ -85,7 +85,7 @@ function wp_login( $user_login, $user ) {
 add_action( 'wp_login', __NAMESPACE__ . '\wp_login', 10, 2 );
 
 /**
- *
+ * Handles the display and processing of the insecure password login interstitial.
  */
 function login_form_sp_insecure_password() {
 	/*
@@ -135,7 +135,7 @@ function admin_notices() {
 			<?php
 			printf(
 				/* translators: %s: Human-readable time interval. */
-				__( 'The insecure password warning has been dismissed for %s.' ),
+				esc_html__( 'The insecure password warning has been dismissed for %s.' ),
 				human_time_diff( time() + SP_REMIND_INTERVAL )
 			);
 			?>
