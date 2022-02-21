@@ -7,7 +7,7 @@
 
 namespace Newfold\Secure_Passwords;
 
-use WP_User;
+use stdClass, WP_User, WP_Error;
 
 if ( ! defined( 'NFD_SECURE_PASSWORD_MODULE_VERSION' ) ) {
 	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.0' );
@@ -165,3 +165,22 @@ function login_enqueue_scripts() {
 	wp_enqueue_style( 'sp-login', plugins_url( '/assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
 }
 add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );
+
+/**
+ * Confirms a password is secure before changing a user's password.
+ *
+ * @param WP_Error $errors WP_Error object (passed by reference).
+ * @param bool     $update Whether this is a user update.
+ * @param stdClass $user   User object (passed by reference).
+ */
+function user_profile_update_errors( $errors, $update, $user ) {
+	if ( empty( $user->user_pass ) ) {
+		return;
+	}
+
+	if ( ! bh_is_password_secure( $user->user_pass ) ) {
+		$errors->add( 'insecure_password', __( 'The entered password was found in a database of insecure passwords. Please choose a different one.', 'newfold' ) );
+	}
+}
+add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_errors', 10, 3 );
+
