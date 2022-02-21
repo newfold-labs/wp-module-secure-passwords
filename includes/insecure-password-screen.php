@@ -51,15 +51,7 @@ login_header( esc_html__( 'Insecure password detected', 'newfold' ), '', $errors
 		</p>
 
 		<p class="admin-email__details">
-			<?php esc_html_e( 'Your password was found in a database of potentially insecure passwords.', 'newfold' ); ?>
-		</p>
-
-		<p class="admin-email__details">
-			<?php esc_html_e( 'When data breaches occur on the internet, security researchers compile leaked data securely and anonymously for informational purposes.', 'newfold' ); ?>
-		</p>
-
-		<p class="admin-email__details">
-			<?php esc_html_e( 'Your password has previously been leaked in a data breach and should be considered insecure.', 'newfold' ); ?>
+			<?php esc_html_e( 'The password you are using was found in a database of insecure passwords. This likely means that that it was part of a previously reported data breach, making it much more likely to be used in attempts by bad actors to compromise sites.', 'newfold' ); ?>
 		</p>
 
 		<p class="admin-email__details">
