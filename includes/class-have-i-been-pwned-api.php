@@ -7,6 +7,8 @@
 
 namespace Newfold\Secure_Passwords;
 
+use WP_Error;
+
 /**
  * A class that interacts with the Have I Been Pwned API.
  *

@@ -7,7 +7,9 @@
 
 namespace Newfold\Secure_Passwords;
 
-use stdClass, WP_User, WP_Error;
+use stdClass;
+use WP_User;
+use WP_Error;
 
 if ( ! defined( 'NFD_SECURE_PASSWORD_MODULE_VERSION' ) ) {
 	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.0' );
@@ -184,3 +186,75 @@ function user_profile_update_errors( $errors, $update, $user ) {
 }
 add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_errors', 10, 3 );
 
+/**
+ * Enforce secure passwords when performing a password reset.
+ *
+ * @param WP_User $user     The user.
+ * @param string  $new_pass New user password.
+ */
+function reset_password( $user, $new_pass ) {
+	if ( ! bh_is_password_secure( $new_pass ) ) {
+		wp_safe_redirect( add_query_arg( array( 'insecure_password', 1 ) ) );
+		exit;
+	}
+}
+add_action( 'reset_password', __NAMESPACE__ . '\reset_password', 10, 2 );
+
+/**
+ * Performs a secure password check on Ajax request.
+ */
+function ajax_sp_is_password_secure() {
+	if ( ! isset( $_GET['password'] ) || empty( $_GET['password'] ) ) {
+		wp_send_json( new WP_Error() );
+	}
+
+	$is_secure = bh_is_password_secure( wp_unslash( $_GET['password'] ) );
+
+	if ( is_wp_error( $is_secure ) ) {
+		wp_send_json_error( $is_secure );
+	}
+
+	wp_send_json_success( $is_secure );
+}
+add_action( 'wp_ajax_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is_password_secure' );
+add_action( 'wp_ajax_nopriv_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is_password_secure' );
+
+/**
+ * Ensures generated passwords are secure.
+ *
+ * To prevent excessive requests and infinite loops, the maximum number of
+ * attempts is limited to 3.
+ *
+ * @param string $password            The generated password.
+ * @param int    $length              The length of password to generate.
+ * @param bool   $special_chars       Whether to include standard special characters.
+ * @param bool   $extra_special_chars Whether to include other special characters.
+ */
+function random_password( $password, $length, $special_chars, $extra_special_chars ) {
+	static $count = 1;
+
+	$is_secure = bh_is_password_secure( $password );
+
+	// If 3 attempts have been made, use the generated password.
+	if ( $count > 3 || $is_secure ) {
+		return $password;
+	}
+
+	$count++;
+
+	return wp_generate_password( $length, $special_chars, $extra_special_chars );
+}
+add_filter( 'random_password', __NAMESPACE__ . '\random_password', 10, 4 );
+
+add_action( 'admin_print_scripts', function() {
+	?>
+		<style>
+			.sp-insecure-password-notice td {
+				padding: 0 10px;
+			}
+		</style>
+	<script>
+		<?php echo file_get_contents( __DIR__ . '/assets/js/secure-passwords.js' ); ?>
+	</script>
+	<?php
+});
