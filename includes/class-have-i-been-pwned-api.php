@@ -100,6 +100,10 @@ class Have_I_Been_Pwned_API {
 
 		$password = trim( $password );
 
+		if ( empty( $password ) ) {
+			return;
+		}
+
 		if ( ! preg_match( '/^[0-9a-f]{40}$/i', $password ) ) {
 			$password = sha1( $password );
 		}
@@ -123,9 +127,7 @@ class Have_I_Been_Pwned_API {
 	 * @return WP_Error|bool
 	 */
 	public function check_password_for_leak( $password = '' ) {
-		if ( ! empty( $password ) ) {
-			$this->store_hash( $password );
-		}
+		$this->store_hash( $password );
 
 		if ( empty( $this->password_hash ) ) {
 			return new WP_Error();
@@ -137,9 +139,7 @@ class Have_I_Been_Pwned_API {
 			return $potential_matches;
 		}
 
-		$leaked = $this->scan_for_match( $potential_matches );
-
-		return $leaked;
+		return $this->scan_for_match( $potential_matches );
 	}
 
 	/**
