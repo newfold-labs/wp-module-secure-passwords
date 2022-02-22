@@ -88,6 +88,16 @@ class Have_I_Been_Pwned_API {
 	 * @param string $password Password to check. Can be a SHA1 hash or plain text.
 	 */
 	public function store_hash( $password ) {
+		/*
+		 * This temporarily limits the class to checking one password per request.
+		 *
+		 * The random_password filter is somehow causing the hashed password that is stored
+		 * to be changed between the wp_authenticate and wp_login actions.
+		 */
+		if ( ! empty( $this->password_hash ) ) {
+			return;
+		}
+
 		$password = trim( $password );
 
 		if ( ! preg_match( '/^[0-9a-f]{40}$/i', $password ) ) {
