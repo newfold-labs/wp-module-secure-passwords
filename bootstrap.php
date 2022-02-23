@@ -2,7 +2,7 @@
 /**
  * Secure Passwords module.
  *
- * @package Newfold\Secure_Passwords
+ * @package Newfold\WP\Module\Secure_Passwords
  */
 
 if ( function_exists( 'add_action' ) ) {

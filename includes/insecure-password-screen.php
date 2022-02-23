@@ -3,7 +3,7 @@
  * Displays the insecure password warning screen when a user logs in
  * if their password has been flagged as leaked.
  *
- * @package Newfold\Secure_Passwords
+ * @package Newfold\WP\Module\Secure_Passwords
  */
 
 $errors = new WP_Error();

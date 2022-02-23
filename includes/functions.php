@@ -2,10 +2,10 @@
 /**
  * General, global namespace module functions.
  *
- * @package Newfold\Secure_Passwords
+ * @package Newfold\WP\Module\Secure_Passwords
  */
 
-use Newfold\Secure_Passwords\Have_I_Been_Pwned_API;
+use Newfold\WP\Module\Secure_Passwords\Have_I_Been_Pwned_API;
 
 /**
  * Checks if a user's password has been flagged as insecure.
@@ -13,12 +13,12 @@ use Newfold\Secure_Passwords\Have_I_Been_Pwned_API;
  * @param int $user_id Optional. User ID to check.
  * @return bool true if password is insecure, false if not.
  */
-function bh_is_user_password_insecure( $user_id = 0 ) {
+function nfd_sp_is_user_password_insecure( $user_id = 0 ) {
 	if ( empty( $user_id ) ) {
 		$user_id = get_current_user_id();
 	}
 
-	return (bool) get_user_meta( $user_id, 'insecure_password', true );
+	return (bool) get_user_meta( $user_id, 'nfd_sp_insecure_password', true );
 }
 
 /**
@@ -32,7 +32,7 @@ function bh_is_user_password_insecure( $user_id = 0 ) {
  * @param int    $user_id Optional. The ID of the user the password belongs to.
  * @return WP_Error|bool Whether the password is secure. WP_Error on failure.
  */
-function bh_is_password_secure( $password = '', $user_id = 0 ) {
+function nfd_sp_is_password_secure( $password = '', $user_id = 0 ) {
 	$password_checker = Have_I_Been_Pwned_API::init();
 
 	if ( ! empty( $user_id ) ) {
@@ -60,9 +60,9 @@ function bh_is_password_secure( $password = '', $user_id = 0 ) {
  *
  * @param int $user_id User ID.
  */
-function sp_mark_password_insecure( $user_id ) {
-	update_user_meta( $user_id, 'insecure_password', true );
-	sp_mark_password_checked( $user_id );
+function nfd_sp_mark_password_insecure( $user_id ) {
+	update_user_meta( $user_id, 'nfd_sp_insecure_password', true );
+	nfd_sp_mark_password_checked( $user_id );
 }
 
 /**
@@ -70,9 +70,9 @@ function sp_mark_password_insecure( $user_id ) {
  *
  * @param int $user_id User ID.
  */
-function sp_mark_password_secure( $user_id ) {
-	delete_user_meta( $user_id, 'insecure_password' );
-	sp_mark_password_checked( $user_id );
+function nfd_sp_mark_password_secure( $user_id ) {
+	delete_user_meta( $user_id, 'nfd_sp_insecure_password' );
+	nfd_sp_mark_password_checked( $user_id );
 }
 
 /**
@@ -80,8 +80,8 @@ function sp_mark_password_secure( $user_id ) {
  *
  * @param int $user_id User ID.
  */
-function sp_mark_password_checked( $user_id ) {
-	update_user_meta( $user_id, 'last_password_check', time() );
+function nfd_sp_mark_password_checked( $user_id ) {
+	update_user_meta( $user_id, 'nfd_sp_last_check', time() );
 }
 
 /**
@@ -92,9 +92,9 @@ function sp_mark_password_checked( $user_id ) {
  * @param int $user_id User ID.
  * @return bool
  */
-function sp_should_check_password( $user_id ) {
+function nfd_sp_should_check_password( $user_id ) {
 	// Password is not currently marked as insecure. Check every 30 days.
-	$last_check = (int) get_user_meta( $user_id, 'last_password_check', true );
+	$last_check = (int) get_user_meta( $user_id, 'nfd_sp_last_check', true );
 
 	// Only check for password compromises every 30 days.
 	if ( $last_check < time() - DAY_IN_SECONDS * 30 ) {
@@ -113,8 +113,8 @@ function sp_should_check_password( $user_id ) {
  * @param int $user_id User ID.
  * @return bool Whether the insecure password screen has been snoozed.
  */
-function sp_is_insecure_password_screen_snoozed( $user_id ) {
-	$next_notice = (int) get_user_meta( $user_id, 'sp_snooze_end', true );
+function nfd_sp_is_insecure_password_screen_snoozed( $user_id ) {
+	$next_notice = (int) get_user_meta( $user_id, 'nfd_sp_snooze_end', true );
 
 	// Not time to display the screen again.
 	if ( time() < $next_notice ) {
@@ -127,7 +127,7 @@ function sp_is_insecure_password_screen_snoozed( $user_id ) {
 /**
  * Redirects a user to the insecure password page.
  */
-function sp_show_insecure_password_screen() {
+function nfd_sp_show_insecure_password_screen() {
 	if ( ! empty( $_REQUEST['redirect_to'] ) ) {
 		$redirect_to = $_REQUEST['redirect_to'];
 	} else {

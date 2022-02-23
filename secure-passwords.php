@@ -2,10 +2,10 @@
 /**
  * Secure password module.
  *
- * @package Newfold\Secure_Passwords
+ * @package Newfold\WP\Module\Secure_Passwords
  */
 
-namespace Newfold\Secure_Passwords;
+namespace Newfold\WP\Module\Secure_Passwords;
 
 use stdClass;
 use WP_User;
@@ -15,8 +15,8 @@ if ( ! defined( 'NFD_SECURE_PASSWORD_MODULE_VERSION' ) ) {
 	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.0' );
 }
 
-if ( ! defined( 'SP_REMIND_INTERVAL' ) ) {
-	define( 'SP_REMIND_INTERVAL', DAY_IN_SECONDS * 90 );
+if ( ! defined( 'NFD_REMIND_INTERVAL' ) ) {
+	define( 'NFD_REMIND_INTERVAL', DAY_IN_SECONDS * 90 );
 }
 
 require_once 'includes/functions.php';
@@ -58,12 +58,12 @@ add_action( 'wp_authenticate', __NAMESPACE__ . '\wp_authenticate', 10, 2 );
  */
 function wp_login( $user_login, $user ) {
 	// Display the insecure password screen for insecure passwords when enough time has passed.
-	if ( bh_is_user_password_insecure( $user->ID ) && ! sp_is_insecure_password_screen_snoozed( $user->ID ) ) {
-		sp_show_insecure_password_screen();
+	if ( nfd_sp_is_user_password_insecure( $user->ID ) && ! nfd_sp_is_insecure_password_screen_snoozed( $user->ID ) ) {
+		nfd_sp_show_insecure_password_screen();
 	}
 
 	// See if it's time to recheck the password.
-	if ( ! sp_should_check_password( $user->ID ) ) {
+	if ( ! nfd_sp_should_check_password( $user->ID ) ) {
 		return;
 	}
 
@@ -71,17 +71,17 @@ function wp_login( $user_login, $user ) {
 	 * When checking passwords on the wp_login action, the password is not available, but
 	 * has already been stored in the Have_I_Been_Pwned class on the `wp_authenticate` action.
 	 */
-	$is_secure = bh_is_password_secure( '', $user->ID );
+	$is_secure = nfd_sp_is_password_secure( '', $user->ID );
 
 	if ( is_wp_error( $is_secure ) ) {
 		return;
 	}
 
 	if ( $is_secure ) {
-		sp_mark_password_secure( $user->ID );
+		nfd_sp_mark_password_secure( $user->ID );
 	} else {
-		sp_mark_password_insecure( $user->ID );
-		sp_show_insecure_password_screen( $user->ID );
+		nfd_sp_mark_password_insecure( $user->ID );
+		nfd_sp_show_insecure_password_screen( $user->ID );
 	}
 }
 add_action( 'wp_login', __NAMESPACE__ . '\wp_login', 10, 2 );
@@ -112,7 +112,7 @@ function login_form_sp_insecure_password() {
 			exit;
 		}
 
-		update_user_meta( get_current_user_id(), 'sp_snooze_end', time() + SP_REMIND_INTERVAL );
+		update_user_meta( get_current_user_id(), 'nfd_sp_snooze_end', time() + NFD_REMIND_INTERVAL );
 
 		$redirect_to = add_query_arg( 'sp_snoozed', 1, $redirect_to );
 		wp_safe_redirect( $redirect_to );
@@ -138,7 +138,7 @@ function admin_notices() {
 			printf(
 				/* translators: %s: Human-readable time interval. */
 				esc_html__( 'The insecure password warning has been dismissed for %s.' ),
-				human_time_diff( time() + SP_REMIND_INTERVAL )
+				human_time_diff( time() + NFD_REMIND_INTERVAL )
 			);
 			?>
 		</p>
@@ -180,8 +180,8 @@ function user_profile_update_errors( $errors, $update, $user ) {
 		return;
 	}
 
-	if ( ! bh_is_password_secure( $user->user_pass ) ) {
-		$errors->add( 'insecure_password', __( 'The entered password was found in a database of insecure passwords. Please choose a different one.', 'newfold' ) );
+	if ( ! nfd_sp_is_password_secure( $user->user_pass ) ) {
+		$errors->add( 'nfd_sp_insecure_password', __( 'The entered password was found in a database of insecure passwords. Please choose a different one.', 'newfold' ) );
 	}
 }
 add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_errors', 10, 3 );
@@ -193,8 +193,8 @@ add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_
  * @param string  $new_pass New user password.
  */
 function reset_password( $user, $new_pass ) {
-	if ( ! bh_is_password_secure( $new_pass ) ) {
-		wp_safe_redirect( add_query_arg( array( 'insecure_password', 1 ) ) );
+	if ( ! nfd_sp_is_password_secure( $new_pass ) ) {
+		wp_safe_redirect( add_query_arg( array( 'nfd_sp_insecure_password', 1 ) ) );
 		exit;
 	}
 }
@@ -208,7 +208,7 @@ function ajax_sp_is_password_secure() {
 		wp_send_json( new WP_Error() );
 	}
 
-	$is_secure = bh_is_password_secure( wp_unslash( $_GET['password'] ) );
+	$is_secure = nfd_sp_is_password_secure( wp_unslash( $_GET['password'] ) );
 
 	if ( is_wp_error( $is_secure ) ) {
 		wp_send_json_error( $is_secure );
@@ -233,7 +233,7 @@ add_action( 'wp_ajax_nopriv_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is
 function random_password( $password, $length, $special_chars, $extra_special_chars ) {
 	static $count = 1;
 
-	$is_secure = bh_is_password_secure( $password );
+	$is_secure = nfd_sp_is_password_secure( $password );
 
 	// If 3 attempts have been made, use the generated password.
 	if ( $count > 3 || $is_secure ) {

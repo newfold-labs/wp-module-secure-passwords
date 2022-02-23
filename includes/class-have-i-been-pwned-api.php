@@ -2,10 +2,10 @@
 /**
  * Have I Been Pwned API.
  *
- * @package Newfold\Secure_Passwords
+ * @package Newfold\WP\Module\Secure_Passwords
  */
 
-namespace Newfold\Secure_Passwords;
+namespace Newfold\WP\Module\Secure_Passwords;
 
 use WP_Error;
 
