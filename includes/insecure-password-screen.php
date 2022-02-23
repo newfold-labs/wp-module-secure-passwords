@@ -17,28 +17,6 @@ if ( ! empty( $_REQUEST['redirect_to'] ) ) {
 login_header( esc_html__( 'Insecure password detected', 'newfold' ), '', $errors );
 
 ?>
-	<style>
-		.login-action-sp_insecure_password #login {
-			width: 60vw;
-			max-width: 650px;
-			margin-top: -2vh;
-		}
-
-		.login .sp-insecure-password-screen .submit {
-			text-align: center;
-		}
-
-		@media screen and (max-width: 782px) {
-			.login-action-insecure_password #login {
-				box-sizing: border-box;
-				margin-top: 0;
-				padding-left: 4vw;
-				padding-right: 4vw;
-				width: 100vw;
-			}
-		}
-	</style>
-
 	<form class="sp-insecure-password-form" name="sp-insecure-password-form" action="<?php echo esc_url( get_edit_user_link() ); ?>" method="post">
 		<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
 

@@ -161,14 +161,6 @@ function removable_query_args( $removable_query_args ) {
 add_filter( 'removable_query_args', __NAMESPACE__ . '\removable_query_args' );
 
 /**
- * Loads the scripts and styles for the insecure password screen.
- */
-function login_enqueue_scripts() {
-	wp_enqueue_style( 'sp-login', plugins_url( '/assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
-}
-add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );
-
-/**
  * Confirms a password is secure before changing a user's password.
  *
  * @param WP_Error $errors WP_Error object (passed by reference).
@@ -272,15 +264,32 @@ function profile_update( $user_id, $old_user_data, $userdata ) {
 }
 add_action( 'profile_update', __NAMESPACE__ . '\profile_update', 10, 3 );
 
-add_action( 'admin_print_scripts', function() {
-	?>
-		<style>
-			.sp-insecure-password-notice td {
-				padding: 0 10px;
-			}
-		</style>
-	<script>
-		<?php echo file_get_contents( __DIR__ . '/assets/js/secure-passwords.js' ); ?>
-	</script>
-	<?php
-});
+/**
+ * Enqueues module related scripts and styles.
+ *
+ * @param string $hook_suffix The current admin page.
+ */
+function admin_enqueue_scripts( $hook_suffix ) {
+	$hooks = array(
+		'profile.php',
+		'user-new.php',
+		'user-edit.php',
+	);
+
+	if ( ! in_array( $hook_suffix, $hooks, true ) ) {
+		return;
+	}
+
+	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION );
+
+	wp_enqueue_style( 'nfd-sp-admin', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
+}
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\admin_enqueue_scripts' );
+
+/**
+ * Enqueues scripts and styles for the login screens.
+ */
+function login_enqueue_scripts() {
+	wp_enqueue_style( 'nfd-sp-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
+}
+add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );

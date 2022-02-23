@@ -77,6 +77,7 @@ function insecurePasswordDetected() {
 	} else if ( body.classList.contains( 'user-new-php' ) ) {
 		document.getElementsByClassName( 'form-table' )[0].firstElementChild.insertBefore( notice, document.getElementsByClassName( 'pw-weak' )[0] );
 	} else {
+		// Editing a user.
 		document.getElementById( 'password' ).parentNode.insertBefore( notice, document.getElementsByClassName( 'pw-weak' )[0] );
 	}
 }

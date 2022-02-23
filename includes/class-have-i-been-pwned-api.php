@@ -104,6 +104,7 @@ class Have_I_Been_Pwned_API {
 			return;
 		}
 
+		// Don't re-hash strings that are already SHA1 hashes.
 		if ( ! preg_match( '/^[0-9a-f]{40}$/i', $password ) ) {
 			$password = sha1( $password );
 		}
