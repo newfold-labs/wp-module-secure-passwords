@@ -246,6 +246,32 @@ function random_password( $password, $length, $special_chars, $extra_special_cha
 }
 add_filter( 'random_password', __NAMESPACE__ . '\random_password', 10, 4 );
 
+/**
+ * Resets module related user meta when a user's password is changed.
+ *
+ * The new password is also checked to ensure security.
+ *
+ * @param int     $user_id       User ID.
+ * @param WP_User $old_user_data Object containing user's data prior to update.
+ * @param array   $userdata      The raw array of data passed to wp_insert_user().
+ */
+function profile_update( $user_id, $old_user_data, $userdata ) {
+	if ( empty( $userdata['user_pass'] ) ) {
+		return;
+	}
+
+	nfd_sp_clear_user_meta( $user_id );
+
+	$is_secure = nfd_sp_is_password_secure( $userdata['user_pass'] );
+
+	if ( $is_secure ) {
+		nfd_sp_mark_password_secure( $user_id );
+	} else {
+		nfd_sp_mark_password_insecure( $user_id );
+	}
+}
+add_action( 'profile_update', __NAMESPACE__ . '\profile_update', 10, 3 );
+
 add_action( 'admin_print_scripts', function() {
 	?>
 		<style>

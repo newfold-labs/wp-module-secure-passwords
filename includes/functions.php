@@ -125,6 +125,17 @@ function nfd_sp_is_insecure_password_screen_snoozed( $user_id ) {
 }
 
 /**
+ * Clears module related user meta when a user is updated.
+ *
+ * @param $user_id
+ */
+function nfd_sp_clear_user_meta( $user_id ) {
+	delete_user_meta( $user_id, 'nfd_sp_insecure_password' );
+	delete_user_meta( $user_id, 'nfd_sp_last_check' );
+	delete_user_meta( $user_id, 'nfd_sp_snooze_end' );
+}
+
+/**
  * Redirects a user to the insecure password page.
  */
 function nfd_sp_show_insecure_password_screen() {
