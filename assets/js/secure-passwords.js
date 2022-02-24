@@ -52,7 +52,7 @@ function insecurePasswordNotice() {
 
 	const notice = document.createElement( 'div' );
 	notice.className = 'notice notice-error error';
-	notice.innerHTML = '<p>The entered password is insecure.</p>';
+	notice.innerHTML = '<p>Please choose a different password. This password was found in a database of insecure passwords.</p>';
 
 	insecureNotice.getElementsByTagName( 'td' )[0].appendChild( notice );
 
