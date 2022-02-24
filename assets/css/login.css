@@ -12,6 +12,10 @@
 	text-align: center;
 }
 
+.sp-insecure-password-message {
+	border-left-color: #d63638;
+}
+
 @media screen and (max-width: 782px) {
 	.login-action-insecure_password #login {
 		box-sizing: border-box;

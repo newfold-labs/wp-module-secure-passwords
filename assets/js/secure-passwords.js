@@ -44,17 +44,26 @@ function checkPassword( newPass ) {
  * @returns {*}
  */
 function insecurePasswordNotice() {
-	const insecureNotice = document.createElement( 'tr' );
-	insecureNotice.className = 'form-field sp-insecure-password-notice';
+	const messageText = 'Please choose a different password. This password was found in a database of insecure passwords.';
+	let insecureNotice;
 
-	insecureNotice.appendChild( document.createElement( 'th' ) );
-	insecureNotice.appendChild( document.createElement( 'td' ) );
+	if ( document.body.classList.contains( 'login-action-rp' ) ) {
+		insecureNotice = document.createElement( 'p' );
+		insecureNotice.className = 'message sp-insecure-password-notice';
+		insecureNotice.innerHTML = messageText;
+	} else {
+		insecureNotice = document.createElement( 'tr' );
+		insecureNotice.className = 'form-field sp-insecure-password-notice';
 
-	const notice = document.createElement( 'div' );
-	notice.className = 'notice notice-error error';
-	notice.innerHTML = '<p>Please choose a different password. This password was found in a database of insecure passwords.</p>';
+		insecureNotice.appendChild( document.createElement( 'th' ) );
+		insecureNotice.appendChild( document.createElement( 'td' ) );
 
-	insecureNotice.getElementsByTagName( 'td' )[0].appendChild( notice );
+		const notice = document.createElement( 'div' );
+		notice.className = 'notice notice-error error';
+		notice.innerHTML = '<p>' + messageText + '</p>';
+
+		insecureNotice.getElementsByTagName( 'td' )[0].appendChild( notice );
+	}
 
 	return insecureNotice;
 }
@@ -65,7 +74,7 @@ function insecurePasswordNotice() {
 function insecurePasswordDetected() {
 	hideWeakPasswordOverride();
 
-	if (0 < document.getElementsByClassName('sp-insecure-password-notice').length) {
+	if ( 0 < document.getElementsByClassName('sp-insecure-password-notice').length ) {
 		return;
 	}
 
@@ -73,7 +82,7 @@ function insecurePasswordDetected() {
 	const body = document.body;
 
 	if ( body.classList.contains( 'login' ) ) {
-		document.getElementsByClassName( 'user-pass1-wrap' )[0].insertBefore( notice, document.getElementsByClassName( 'pw-weak' )[0] );
+		document.getElementById( 'login' ).insertBefore( notice, document.getElementById( 'resetpassform' ) );
 	} else if ( body.classList.contains( 'user-new-php' ) ) {
 		document.getElementsByClassName( 'form-table' )[0].firstElementChild.insertBefore( notice, document.getElementsByClassName( 'pw-weak' )[0] );
 	} else {
