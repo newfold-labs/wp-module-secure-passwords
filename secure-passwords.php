@@ -345,6 +345,8 @@ add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\admin_enqueue_scripts' );
  * @since 1.0.0
  */
 function login_enqueue_scripts() {
+	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION );
+
 	wp_enqueue_style( 'nfd-sp-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
 }
 add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );
