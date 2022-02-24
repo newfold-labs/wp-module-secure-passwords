@@ -27,11 +27,15 @@ use WP_Error;
  *
  * @link https://haveibeenpwned.com/API/v3#PwnedPasswords
  * @link https://en.wikipedia.org/wiki/K-anonymity
+ *
+ * @since 1.0.0
  */
 class Have_I_Been_Pwned_API {
 
 	/**
 	 * The single instance of the class.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @var Have_I_Been_Pwned_API
 	 */
@@ -39,6 +43,8 @@ class Have_I_Been_Pwned_API {
 
 	/**
 	 * The Have I Been Pwned API URL.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @var string
 	 */
@@ -49,6 +55,8 @@ class Have_I_Been_Pwned_API {
 	 *
 	 * @link https://haveibeenpwned.com/API/v3#PwnedPasswordsPadding
 	 *
+	 * @since 1.0.0
+	 *
 	 * @var bool
 	 */
 	private $use_padding = false;
@@ -58,6 +66,8 @@ class Have_I_Been_Pwned_API {
 	 *
 	 * This is only used for temporary storage when attempting to login.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	public $user_login;
@@ -65,12 +75,19 @@ class Have_I_Been_Pwned_API {
 	/**
 	 * The password being checked as a SHA1 hash.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @var string
 	 */
 	private $password_hash;
 
 	/**
 	 * Ensures only one instance of the class is created.
+	 *
+	 * This ensures the user_login and password_hash properties carry over
+	 * during an authentication attempt so that the user can be properly verified.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @return Have_I_Been_Pwned_API
 	 */
@@ -84,6 +101,8 @@ class Have_I_Been_Pwned_API {
 
 	/**
 	 * Stores a password as a SHA1 hash for later use.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param string $password Password to check. Can be a SHA1 hash or plain text.
 	 */
@@ -115,6 +134,8 @@ class Have_I_Been_Pwned_API {
 	/**
 	 * Stores the user login for the password being checked.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @param string $user_login User login.
 	 */
 	public function store_user_login( $user_login ) {
@@ -124,14 +145,20 @@ class Have_I_Been_Pwned_API {
 	/**
 	 * Checks a password for leaks.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @param string $password Optional. The password to check. Can be a SHA1 hash or plain text.
-	 * @return WP_Error|bool
+	 * @return WP_Error|bool WP_Error on failure, true when a password has been leaked, false when
+	 *                       the password has not been leaked and can be considered secure.
 	 */
-	public function check_password_for_leak( $password = '' ) {
+	public function has_password_been_leaked( $password = '' ) {
 		$this->store_hash( $password );
 
 		if ( empty( $this->password_hash ) ) {
-			return new WP_Error();
+			return new WP_Error(
+				'nfd_sp_empty_password',
+				'A password was not passed to check.'
+			);
 		}
 
 		$potential_matches = $this->search_range();
@@ -148,7 +175,9 @@ class Have_I_Been_Pwned_API {
 	 *
 	 * @link https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange
 	 *
-	 * @return array|WP_Error An array of potential SHA1 hash matches on success. A WP_Error on failure.
+	 * @since 1.0.0
+	 *
+	 * @return array|WP_Error An array of potential matching SHA1 hashes on success. A WP_Error on failure.
 	 */
 	public function search_range() {
 		$args        = array();
@@ -183,8 +212,10 @@ class Have_I_Been_Pwned_API {
 	/**
 	 * Scans a list of partial hashes for a full hash match.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @param array $potential_matches A list of hash suffixes of potential matches.
-	 * @return bool true if a match is found, false if not.
+	 * @return bool true if a full hash match is found, false if not.
 	 */
 	public function scan_for_match( $potential_matches ) {
 		if ( empty( $potential_matches ) ) {
@@ -205,27 +236,40 @@ class Have_I_Been_Pwned_API {
 	/**
 	 * Performs a GET request to the Have I Been Pwned API.
 	 *
+	 * @since 1.0.0
+	 *
 	 * @param string $url The API URL for the request.
 	 * @param array  $args Optional. Request arguments. Default empty array.
-	 * @return string|WP_Error
+	 * @return string|WP_Error Response body on success, WP_Error on failure.
 	 */
 	public function make_request( $url, $args = array() ) {
 		$response = wp_remote_get( $url, $args );
 
 		if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
 			return new WP_Error(
-				'',
+				'nfd_sp_api_error',
 				'There was a problem checking this password for security.'
 			);
 		}
 
-		return wp_remote_retrieve_body( $response );
+		$body = wp_remote_retrieve_body( $response );
+
+		if ( false !== strpos( $body, 'hash prefix was not in a valid format' ) ) {
+			return new WP_Error(
+				'nfd_sp_invalid_hash',
+				'An invalid hash was submitted to the API.'
+			);
+		}
+
+		return $body;
 	}
 
 	/**
 	 * Callback for array_filter() that removes padded entries.
 	 *
 	 * @see https://haveibeenpwned.com/API/v3#PwnedPasswordsPadding
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param string $entry Entry to check.
 	 * @return bool Returns false when the entry is for padding purposes, true when a potential match.
@@ -245,6 +289,8 @@ class Have_I_Been_Pwned_API {
 	 * count of how many times it appears in the data set. For our purposes, the
 	 * count does not matter. The presence of the hash is enough to consider the
 	 * password insecure.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param string $entry The partial hash followed by :X, where X is the count.
 	 * @return string The partial hash with the count removed.

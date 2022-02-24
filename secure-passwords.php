@@ -15,8 +15,14 @@ if ( ! defined( 'NFD_SECURE_PASSWORD_MODULE_VERSION' ) ) {
 	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.0' );
 }
 
+// The interval to inform the user of an insecure password when remind me later is clicked.
 if ( ! defined( 'NFD_REMIND_INTERVAL' ) ) {
 	define( 'NFD_REMIND_INTERVAL', DAY_IN_SECONDS * 90 );
+}
+
+// The interval to search the HaveIBeenPwned API.
+if ( ! defined( 'NFD_CHECK_INTERVAL' ) ) {
+	define( 'NFD_CHECK_INTERVAL', DAY_IN_SECONDS * 90 );
 }
 
 require_once 'includes/functions.php';
@@ -25,7 +31,7 @@ require_once 'includes/class-have-i-been-pwned-api.php';
 /**
  * Begin a secure password check when a user attempts to authenticate.
  *
- * This is the last action hook where the password entered is available.
+ * This is the last action hook before a user's password is hashed when logging in.
  * This hashes and stores the entered login information for use later in the
  * request if the credentials are correct and authentication is successful.
  *
@@ -53,13 +59,15 @@ add_action( 'wp_authenticate', __NAMESPACE__ . '\wp_authenticate', 10, 2 );
 /**
  * Checks a user account for a leaked password on login.
  *
+ * @since 1.0.0
+ *
  * @param string  $user_login Username.
  * @param WP_User $user       WP_User object of the logged-in user.
  */
 function wp_login( $user_login, $user ) {
 	// Display the insecure password screen for insecure passwords when enough time has passed.
-	if ( nfd_sp_is_user_password_insecure( $user->ID ) && ! nfd_sp_is_insecure_password_screen_snoozed( $user->ID ) ) {
-		nfd_sp_show_insecure_password_screen();
+	if ( ! nfd_sp_is_user_password_secure( $user->ID ) && nfd_sp_show_insecure_password_screen( $user->ID ) ) {
+		nfd_sp_display_insecure_password_screen();
 	}
 
 	// See if it's time to recheck the password.
@@ -81,13 +89,19 @@ function wp_login( $user_login, $user ) {
 		nfd_sp_mark_password_secure( $user->ID );
 	} else {
 		nfd_sp_mark_password_insecure( $user->ID );
-		nfd_sp_show_insecure_password_screen( $user->ID );
+		nfd_sp_display_insecure_password_screen( $user->ID );
 	}
 }
 add_action( 'wp_login', __NAMESPACE__ . '\wp_login', 10, 2 );
 
 /**
- * Handles the display and processing of the insecure password login interstitial.
+ * Handles the insecure password login interstitial.
+ *
+ * When the user has clicked Remind me later, this snoozes the notification and
+ * redirects the user appropriately. Otherwise, the insecure password
+ * interstitial is shown.
+ *
+ * @since 1.0.0
  */
 function login_form_sp_insecure_password() {
 	/*
@@ -112,9 +126,9 @@ function login_form_sp_insecure_password() {
 			exit;
 		}
 
-		update_user_meta( get_current_user_id(), 'nfd_sp_snooze_end', time() + NFD_REMIND_INTERVAL );
+		update_user_meta( get_current_user_id(), 'nfd_sp_next_notice', time() + NFD_REMIND_INTERVAL );
 
-		$redirect_to = add_query_arg( 'sp_snoozed', 1, $redirect_to );
+		$redirect_to = add_query_arg( 'nfd_sp_dismissed', 1, $redirect_to );
 		wp_safe_redirect( $redirect_to );
 		exit;
 	}
@@ -125,19 +139,20 @@ add_action( 'login_form_sp_insecure_password', __NAMESPACE__ . '\login_form_sp_i
 
 /**
  * Displays an admin notice when the insecure password page is dismissed.
+ *
+ * @since 1.0.0
  */
 function admin_notices() {
-	if ( ! isset( $_GET['sp_snoozed'] ) ) {
+	if ( ! isset( $_GET['nfd_sp_dismissed'] ) ) {
 		return;
 	}
-
 	?>
 	<div class="notice notice-success is-dismissible">
 		<p>
 			<?php
 			printf(
 				/* translators: %s: Human-readable time interval. */
-				esc_html__( 'The insecure password warning has been dismissed for %s.' ),
+				esc_html__( 'You will not see an insecure password notice for %s.', 'newfold' ),
 				human_time_diff( time() + NFD_REMIND_INTERVAL )
 			);
 			?>
@@ -150,11 +165,13 @@ add_action( 'admin_notices', __NAMESPACE__ . '\admin_notices' );
 /**
  * Remove related query args after processing.
  *
+ * @since 1.0.0
+ *
  * @param string[] $removable_query_args An array of query variable names to remove from a URL.
  * @return string[] An adjusted array of query variable names to remove from the URL.
  */
 function removable_query_args( $removable_query_args ) {
-	$removable_args[] = 'sp_snoozed';
+	$removable_args[] = 'nfd_sp_dismissed';
 
 	return $removable_args;
 }
@@ -162,6 +179,8 @@ add_filter( 'removable_query_args', __NAMESPACE__ . '\removable_query_args' );
 
 /**
  * Confirms a password is secure before changing a user's password.
+ *
+ * @since 1.0.0
  *
  * @param WP_Error $errors WP_Error object (passed by reference).
  * @param bool     $update Whether this is a user update.
@@ -172,20 +191,36 @@ function user_profile_update_errors( $errors, $update, $user ) {
 		return;
 	}
 
-	if ( ! nfd_sp_is_password_secure( $user->user_pass ) ) {
-		$errors->add( 'nfd_sp_insecure_password', __( 'The entered password was found in a database of insecure passwords. Please choose a different one.', 'newfold' ) );
+	$is_secure = nfd_sp_is_password_secure( $user->user_pass );
+
+	if ( is_wp_error( $is_secure ) ) {
+		$errors->merge_from( $is_secure );
+	} elseif ( ! $is_secure ) {
+		$errors->add(
+		'nfd_sp_insecure_password',
+		__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'newfold' )
+		);
 	}
 }
 add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_errors', 10, 3 );
 
 /**
- * Enforce secure passwords when performing a password reset.
+ * Enforces secure passwords when performing a password reset.
+ *
+ * @since 1.0.0
  *
  * @param WP_User $user     The user.
  * @param string  $new_pass New user password.
  */
 function reset_password( $user, $new_pass ) {
-	if ( ! nfd_sp_is_password_secure( $new_pass ) ) {
+	$is_secure = nfd_sp_is_password_secure( $new_pass );
+
+	// The password could not be confirmed as secure.
+	if ( is_wp_error( $is_secure ) ) {
+		return;
+	}
+
+	if ( ! $is_secure ) {
 		wp_safe_redirect( add_query_arg( array( 'nfd_sp_insecure_password', 1 ) ) );
 		exit;
 	}
@@ -194,6 +229,8 @@ add_action( 'reset_password', __NAMESPACE__ . '\reset_password', 10, 2 );
 
 /**
  * Performs a secure password check on Ajax request.
+ *
+ * @since 1.0.0
  */
 function ajax_sp_is_password_secure() {
 	if ( ! isset( $_GET['password'] ) || empty( $_GET['password'] ) ) {
@@ -215,7 +252,9 @@ add_action( 'wp_ajax_nopriv_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is
  * Ensures generated passwords are secure.
  *
  * To prevent excessive requests and infinite loops, the maximum number of
- * attempts is limited to 3.
+ * attempts is 3.
+ *
+ * @since 1.0.0
  *
  * @param string $password            The generated password.
  * @param int    $length              The length of password to generate.
@@ -226,6 +265,11 @@ function random_password( $password, $length, $special_chars, $extra_special_cha
 	static $count = 1;
 
 	$is_secure = nfd_sp_is_password_secure( $password );
+
+	// The password could not be confirmed as secure.
+	if ( is_wp_error( $is_secure ) ) {
+		return $password;
+	}
 
 	// If 3 attempts have been made, use the generated password.
 	if ( $count > 3 || $is_secure ) {
@@ -241,9 +285,11 @@ add_filter( 'random_password', __NAMESPACE__ . '\random_password', 10, 4 );
 /**
  * Resets module related user meta when a user's password is changed.
  *
- * The new password is also checked to ensure security.
+ * An additional check is performed to ensure the new password is secure.
  *
- * @param int     $user_id       User ID.
+ * @since 1.0.0
+ *
+ * @param int $user_id User ID.
  * @param WP_User $old_user_data Object containing user's data prior to update.
  * @param array   $userdata      The raw array of data passed to wp_insert_user().
  */
@@ -256,6 +302,11 @@ function profile_update( $user_id, $old_user_data, $userdata ) {
 
 	$is_secure = nfd_sp_is_password_secure( $userdata['user_pass'] );
 
+	// The password could not be confirmed as secure.
+	if ( is_wp_error( $is_secure ) ) {
+		return;
+	}
+
 	if ( $is_secure ) {
 		nfd_sp_mark_password_secure( $user_id );
 	} else {
@@ -266,6 +317,8 @@ add_action( 'profile_update', __NAMESPACE__ . '\profile_update', 10, 3 );
 
 /**
  * Enqueues module related scripts and styles.
+ *
+ * @since 1.0.0
  *
  * @param string $hook_suffix The current admin page.
  */
@@ -288,6 +341,8 @@ add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\admin_enqueue_scripts' );
 
 /**
  * Enqueues scripts and styles for the login screens.
+ *
+ * @since 1.0.0
  */
 function login_enqueue_scripts() {
 	wp_enqueue_style( 'nfd-sp-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
