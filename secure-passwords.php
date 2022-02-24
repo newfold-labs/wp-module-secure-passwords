@@ -103,7 +103,7 @@ add_action( 'wp_login', __NAMESPACE__ . '\wp_login', 10, 2 );
  *
  * @since 1.0.0
  */
-function login_form_sp_insecure_password() {
+function login_form_nfd_sp_insecure_password() {
 	/*
 	 * Note that `is_user_logged_in()` will return false immediately after logging in
 	 * as the current user is not set, see wp-includes/pluggable.php.
@@ -120,8 +120,8 @@ function login_form_sp_insecure_password() {
 		$redirect_to = admin_url();
 	}
 
-	if ( ! empty( $_GET['sp_remind_later'] ) ) {
-		if ( ! wp_verify_nonce( $_GET['sp_remind_later'], 'sp_remind_later_nonce' ) ) {
+	if ( ! empty( $_GET['nfd_sp_remind_later'] ) ) {
+		if ( ! wp_verify_nonce( $_GET['nfd_sp_remind_later'], 'nfd_sp_remind_later_nonce' ) ) {
 			wp_safe_redirect( wp_login_url() );
 			exit;
 		}
@@ -135,7 +135,7 @@ function login_form_sp_insecure_password() {
 
 	require_once 'includes/insecure-password-screen.php';
 }
-add_action( 'login_form_sp_insecure_password', __NAMESPACE__ . '\login_form_sp_insecure_password' );
+add_action( 'login_form_nfd_sp_insecure_password', __NAMESPACE__ . '\login_form_nfd_sp_insecure_password' );
 
 /**
  * Displays an admin notice when the insecure password page is dismissed.
@@ -222,7 +222,6 @@ function reset_password( $user, $new_pass ) {
 
 	if ( ! $is_secure ) {
 		wp_safe_redirect( add_query_arg( array( 'nfd_sp_insecure_password', 1 ) ) );
-		wp_safe_redirect( add_query_arg( array( 'sp_insecure_password', 1 ) ) );
 		exit;
 	}
 }

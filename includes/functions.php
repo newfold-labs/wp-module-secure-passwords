@@ -165,7 +165,7 @@ function nfd_sp_display_insecure_password_screen() {
 	wp_safe_redirect(
 		add_query_arg(
 			'action',
-			'sp_insecure_password',
+			'nfd_sp_insecure_password',
 			wp_login_url( $redirect_to )
 		)
 	);

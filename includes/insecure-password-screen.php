@@ -47,8 +47,8 @@ login_header( esc_html__( 'Insecure password detected', 'newfold' ), '', $errors
 				$remind_me_link = wp_login_url( $redirect_to );
 				$remind_me_link = add_query_arg(
 					array(
-						'action'          => 'sp_insecure_password',
-						'sp_remind_later' => wp_create_nonce( 'sp_remind_later_nonce' ),
+						'action'              => 'nfd_sp_insecure_password',
+						'nfd_sp_remind_later' => wp_create_nonce( 'nfd_sp_remind_later_nonce' ),
 					),
 					$remind_me_link
 				);

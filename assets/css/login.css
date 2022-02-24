@@ -1,10 +1,10 @@
-.login-action-sp_insecure_password #login {
+.login-action-nfd_sp_insecure_password #login {
 	width: 60vw;
 	max-width: 650px;
 	margin-top: -2vh;
 }
 
-.login.login-action-sp_insecure_password .button-primary {
+.login.login-action-nfd_sp_insecure_password .button-primary {
 	margin-left: 0;
 }
 
