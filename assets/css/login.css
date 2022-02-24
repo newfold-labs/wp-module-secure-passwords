@@ -4,6 +4,10 @@
 	margin-top: -2vh;
 }
 
+.login.login-action-sp_insecure_password .button-primary {
+	margin-left: 0;
+}
+
 .login .sp-insecure-password-screen .submit {
 	text-align: center;
 }
