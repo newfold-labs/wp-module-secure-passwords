@@ -222,10 +222,21 @@ function reset_password( $user, $new_pass ) {
 
 	if ( ! $is_secure ) {
 		wp_safe_redirect( add_query_arg( array( 'nfd_sp_insecure_password', 1 ) ) );
+		wp_safe_redirect( add_query_arg( array( 'sp_insecure_password', 1 ) ) );
 		exit;
 	}
 }
 add_action( 'reset_password', __NAMESPACE__ . '\reset_password', 10, 2 );
+
+/**
+ * Resets the user's secure password information after a password reset.
+ *
+ * @param WP_User $user     The user.
+ */
+function after_password_reset( $user ) {
+	nfd_sp_clear_user_meta( $user->ID );
+}
+add_action( 'after_password_reset', __NAMESPACE__ . '\after_password_reset' );
 
 /**
  * Performs a secure password check on Ajax request.
