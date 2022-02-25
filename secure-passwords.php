@@ -66,12 +66,12 @@ add_action( 'wp_authenticate', __NAMESPACE__ . '\wp_authenticate', 10, 2 );
  */
 function wp_login( $user_login, $user ) {
 	// Display the insecure password screen for insecure passwords when enough time has passed.
-	if ( ! nfd_sp_is_user_password_secure( $user->ID ) && nfd_sp_show_insecure_password_screen( $user->ID ) ) {
-		nfd_sp_display_insecure_password_screen();
+	if ( ! is_user_password_secure( $user->ID ) && show_insecure_password_screen( $user->ID ) ) {
+		display_insecure_password_screen();
 	}
 
 	// See if it's time to recheck the password.
-	if ( ! nfd_sp_should_check_password( $user->ID ) ) {
+	if ( ! should_check_password( $user->ID ) ) {
 		return;
 	}
 
@@ -79,17 +79,17 @@ function wp_login( $user_login, $user ) {
 	 * When checking passwords on the wp_login action, the password is not available, but
 	 * has already been stored in the Have_I_Been_Pwned class on the `wp_authenticate` action.
 	 */
-	$is_secure = nfd_sp_is_password_secure( '', $user->ID );
+	$is_secure = is_password_secure( '', $user->ID );
 
 	if ( is_wp_error( $is_secure ) ) {
 		return;
 	}
 
 	if ( $is_secure ) {
-		nfd_sp_mark_password_secure( $user->ID );
+		mark_password_secure( $user->ID );
 	} else {
-		nfd_sp_mark_password_insecure( $user->ID );
-		nfd_sp_display_insecure_password_screen( $user->ID );
+		mark_password_insecure( $user->ID );
+		display_insecure_password_screen( $user->ID );
 	}
 }
 add_action( 'wp_login', __NAMESPACE__ . '\wp_login', 10, 2 );
@@ -191,7 +191,7 @@ function user_profile_update_errors( $errors, $update, $user ) {
 		return;
 	}
 
-	$is_secure = nfd_sp_is_password_secure( $user->user_pass );
+	$is_secure = is_password_secure( $user->user_pass );
 
 	if ( is_wp_error( $is_secure ) ) {
 		$errors->merge_from( $is_secure );
@@ -213,7 +213,7 @@ add_action( 'user_profile_update_errors', __NAMESPACE__ . '\user_profile_update_
  * @param string  $new_pass New user password.
  */
 function reset_password( $user, $new_pass ) {
-	$is_secure = nfd_sp_is_password_secure( $new_pass );
+	$is_secure = is_password_secure( $new_pass );
 
 	// The password could not be confirmed as secure.
 	if ( is_wp_error( $is_secure ) ) {
@@ -233,7 +233,7 @@ add_action( 'reset_password', __NAMESPACE__ . '\reset_password', 10, 2 );
  * @param WP_User $user     The user.
  */
 function after_password_reset( $user ) {
-	nfd_sp_clear_user_meta( $user->ID );
+	clear_user_meta( $user->ID );
 }
 add_action( 'after_password_reset', __NAMESPACE__ . '\after_password_reset' );
 
@@ -247,7 +247,7 @@ function ajax_sp_is_password_secure() {
 		wp_send_json( new WP_Error() );
 	}
 
-	$is_secure = nfd_sp_is_password_secure( wp_unslash( $_GET['password'] ) );
+	$is_secure = is_password_secure( wp_unslash( $_GET['password'] ) );
 
 	if ( is_wp_error( $is_secure ) ) {
 		wp_send_json_error( $is_secure );
@@ -274,7 +274,7 @@ add_action( 'wp_ajax_nopriv_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is
 function random_password( $password, $length, $special_chars, $extra_special_chars ) {
 	static $count = 1;
 
-	$is_secure = nfd_sp_is_password_secure( $password );
+	$is_secure = is_password_secure( $password );
 
 	// The password could not be confirmed as secure.
 	if ( is_wp_error( $is_secure ) ) {
@@ -308,9 +308,9 @@ function profile_update( $user_id, $old_user_data, $userdata ) {
 		return;
 	}
 
-	nfd_sp_clear_user_meta( $user_id );
+	clear_user_meta( $user_id );
 
-	$is_secure = nfd_sp_is_password_secure( $userdata['user_pass'] );
+	$is_secure = is_password_secure( $userdata['user_pass'] );
 
 	// The password could not be confirmed as secure.
 	if ( is_wp_error( $is_secure ) ) {
@@ -318,9 +318,9 @@ function profile_update( $user_id, $old_user_data, $userdata ) {
 	}
 
 	if ( $is_secure ) {
-		nfd_sp_mark_password_secure( $user_id );
+		mark_password_secure( $user_id );
 	} else {
-		nfd_sp_mark_password_insecure( $user_id );
+		mark_password_insecure( $user_id );
 	}
 }
 add_action( 'profile_update', __NAMESPACE__ . '\profile_update', 10, 3 );
