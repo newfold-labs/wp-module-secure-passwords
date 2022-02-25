@@ -12,6 +12,10 @@
 	text-align: center;
 }
 
+.pw-weak {
+	display: none !important;
+}
+
 .sp-insecure-password-message {
 	border-left-color: #d63638;
 }
