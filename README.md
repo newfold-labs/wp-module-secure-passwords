@@ -15,10 +15,10 @@ Stuff
  composer config repositories.bluehost composer https://bluehost.github.io/satis
  ```
 
-### 2. Require the `Newfold/secure-passwords` package.
+### 2. Require the `bluehost/wp-module-secure-passwords` package.
 
  ```bash
- composer require Newfold/newfold-wp-module-secure-passwords
+ composer require bluehost/wp-module-secure-passwords
  ```
 
 ## Usage
