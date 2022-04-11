@@ -1,6 +1,6 @@
 {
 	"name": "bluehost/wp-module-secure-passwords",
-	"description": "Stuff",
+	"description": "Prevents passwords exposed in data breaches from being used and encourages better password hygiene.",
 	"type": "library",
 	"license": "GPL-2.0-or-later",
 	"repositories": [
