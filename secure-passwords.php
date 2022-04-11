@@ -153,7 +153,7 @@ function admin_notices() {
 			printf(
 				/* translators: %s: Human-readable time interval. */
 				esc_html__( 'You will not see an insecure password notice for %s.', 'newfold' ),
-				human_time_diff( time() + NFD_REMIND_INTERVAL )
+				esc_html( human_time_diff( time() + NFD_REMIND_INTERVAL ) )
 			);
 			?>
 		</p>
@@ -197,8 +197,8 @@ function user_profile_update_errors( $errors, $update, $user ) {
 		$errors->merge_from( $is_secure );
 	} elseif ( ! $is_secure ) {
 		$errors->add(
-		'nfd_sp_insecure_password',
-		__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'newfold' )
+			'nfd_sp_insecure_password',
+			__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'newfold' )
 		);
 	}
 }
@@ -299,7 +299,7 @@ add_filter( 'random_password', __NAMESPACE__ . '\random_password', 10, 4 );
  *
  * @since 1.0.0
  *
- * @param int $user_id User ID.
+ * @param int     $user_id User ID.
  * @param WP_User $old_user_data Object containing user's data prior to update.
  * @param array   $userdata      The raw array of data passed to wp_insert_user().
  */
@@ -343,9 +343,9 @@ function admin_enqueue_scripts( $hook_suffix ) {
 		return;
 	}
 
-	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION );
+	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION, true );
 
-	wp_enqueue_style( 'nfd-sp-admin', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
+	wp_enqueue_style( 'nfd-secure-passwords-admin', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
 }
 add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\admin_enqueue_scripts' );
 
@@ -355,8 +355,8 @@ add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\admin_enqueue_scripts' );
  * @since 1.0.0
  */
 function login_enqueue_scripts() {
-	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION );
+	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION, true );
 
-	wp_enqueue_style( 'nfd-sp-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
+	wp_enqueue_style( 'nfd-secure-passwords-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
 }
 add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );

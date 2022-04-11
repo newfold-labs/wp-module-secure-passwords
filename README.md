@@ -5,7 +5,11 @@ height="42" />
 
 # Secure Passwords WordPress Module
 
-Stuff
+This module requires users to use more secure passwords by preventing the use of any passwords exposed in data breaches.
+
+To determine if a password is insecure, the module interacts with the Have I Been Pwned API, which contains a list of
+passwords previously exposed in data breaches. When this module was created, this API contained more than half a billion
+passwords. New data breaches are added as they occur.
 
 ## Installation
 
@@ -15,10 +19,10 @@ Stuff
  composer config repositories.bluehost composer https://bluehost.github.io/satis
  ```
 
-### 2. Require the `Newfold/secure-passwords` package.
+### 2. Require the `bluehost/wp-module-secure-passwords` package.
 
  ```bash
- composer require Newfold/newfold-wp-module-secure-passwords
+ composer require bluehost/wp-module-secure-passwords
  ```
 
 ## Usage
