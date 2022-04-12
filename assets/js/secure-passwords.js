@@ -121,23 +121,24 @@ function hideWeakPasswordOverride() {
 	document.getElementsByClassName( 'pw-weak' )[0].style.display = "none";
 }
 
-if ( window ) {
-	window.addEventListener('load', function () {
-		const passwordField = document.getElementById('pass1');
+window.addEventListener('load', function () {
+	const passwordField = document.getElementById('pass1');
+
+	if (passwordField) {
 		passwordField.addEventListener('keyup', debounce(passwordKeyup));
+	}
 
-		const generatePasswordButtons = document.getElementsByClassName('wp-generate-pw');
+	const generatePasswordButtons = document.getElementsByClassName('wp-generate-pw');
 
-		if (generatePasswordButtons.length > 0) {
-			Array.prototype.forEach.call(generatePasswordButtons, function (element) {
-				/*
-				 * When generate password buttons are clicked, it's safe to assume that the returned
-				 * password is secure.
-				 */
-				element.addEventListener('click', function () {
-					securePasswordDetected();
-				});
+	if (generatePasswordButtons.length > 0) {
+		Array.prototype.forEach.call(generatePasswordButtons, function (element) {
+			/*
+			 * When generate password buttons are clicked, it's safe to assume that the returned
+			 * password is secure.
+			 */
+			element.addEventListener('click', function () {
+				securePasswordDetected();
 			});
-		}
-	});
-}
+		});
+	}
+});
