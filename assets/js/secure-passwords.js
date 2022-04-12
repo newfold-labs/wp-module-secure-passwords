@@ -49,11 +49,11 @@ function insecurePasswordNotice() {
 
 	if ( document.body.classList.contains( 'login-action-rp' ) ) {
 		insecureNotice = document.createElement( 'p' );
-		insecureNotice.className = 'message sp-insecure-password-notice';
+		insecureNotice.className = 'message nfd-sp-insecure-password-notice';
 		insecureNotice.innerHTML = messageText;
 	} else {
 		insecureNotice = document.createElement( 'tr' );
-		insecureNotice.className = 'form-field sp-insecure-password-notice';
+		insecureNotice.className = 'form-field nfd-sp-insecure-password-notice';
 
 		insecureNotice.appendChild( document.createElement( 'th' ) );
 		insecureNotice.appendChild( document.createElement( 'td' ) );
@@ -74,7 +74,7 @@ function insecurePasswordNotice() {
 function insecurePasswordDetected() {
 	hideWeakPasswordOverride();
 
-	if ( 0 < document.getElementsByClassName('sp-insecure-password-notice').length ) {
+	if ( 0 < document.getElementsByClassName('nfd-sp-insecure-password-notice').length ) {
 		return;
 	}
 
@@ -95,7 +95,7 @@ function insecurePasswordDetected() {
  * Takes appropriate actions when a secure password is entered.
  */
 function securePasswordDetected() {
-	const notices = document.getElementsByClassName( 'sp-insecure-password-notice' );
+	const notices = document.getElementsByClassName( 'nfd-sp-insecure-password-notice' );
 
 	if ( notices.length > 0 ) {
 		Array.prototype.forEach.call( notices, function( element ) {
