@@ -12,7 +12,7 @@ use WP_User;
 use WP_Error;
 
 if ( ! defined( 'NFD_SECURE_PASSWORD_MODULE_VERSION' ) ) {
-	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.2' );
+	define( 'NFD_SECURE_PASSWORD_MODULE_VERSION', '1.0.3' );
 }
 
 // The interval to inform the user of an insecure password when remind me later is clicked.
