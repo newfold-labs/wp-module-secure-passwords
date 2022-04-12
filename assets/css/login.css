@@ -16,7 +16,7 @@
 	display: none !important;
 }
 
-.sp-insecure-password-message {
+.message.sp-insecure-password-notice {
 	border-left-color: #d63638;
 }
 
