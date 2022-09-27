@@ -1,5 +1,5 @@
 {
-	"name": "wp-module-secure-passwords",
+	"name": "@newfold-labs/wp-module-secure-passwords",
 	"description": "Stuff",
 	"license": "GPL-2.0-or-later",
 	"private": true,
