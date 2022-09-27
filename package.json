@@ -1,6 +1,6 @@
 {
-	"name": "wp-module-secure-passwords",
-	"description": "Stuff",
+	"name": "@newfold-labs/wp-module-secure-passwords",
+	"description": "A module to secure passwords",
 	"license": "GPL-2.0-or-later",
 	"private": true,
 	"author": {
