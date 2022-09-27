@@ -11,6 +11,10 @@ To determine if a password is insecure, the module interacts with the Have I Bee
 passwords previously exposed in data breaches. When this module was created, this API contained more than half a billion
 passwords. New data breaches are added as they occur.
 
+## Releasing Updates
+
+Upon tagging a new release, ensure that the constant `NFD_SECURE_PASSWORD_MODULE_VERSION` at line 15 of `/secure-passwords.php` is updated. This constant is currently only used for cache-busting assets on admin and login pages.
+
 ## Installation
 
 ### 1. Add the Newfold Satis to your `composer.json`.
