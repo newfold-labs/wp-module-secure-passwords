@@ -109,6 +109,11 @@ function record_password_check( $user_id ) {
  * @return bool Whether the password should be checked for security.
  */
 function should_check_password( $user_id ) {
+
+	if ( wp_get_environment_type() === 'local' ) {
+		return false;
+	}
+
 	// Password is not currently marked as insecure. Check every 30 days.
 	$last_check = (int) get_user_meta( $user_id, 'nfd_sp_last_check', true );
 
