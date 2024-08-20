@@ -31,6 +31,6 @@ Upon tagging a new release, ensure that the constant `NFD_SECURE_PASSWORD_MODULE
 
 ## Usage
 
-## More on NewFold WordPress Modules
+## More on Newfold WordPress Modules
 
 [More on Newfold WordPress Modules](https://github.com/newfold-labs/wp-module-loader)
