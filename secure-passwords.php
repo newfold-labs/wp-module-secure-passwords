@@ -272,22 +272,62 @@ add_action( 'wp_ajax_nopriv_sp-is-password-secure', __NAMESPACE__ . '\ajax_sp_is
  * @param bool   $extra_special_chars Whether to include other special characters.
  */
 function random_password( $password, $length, $special_chars, $extra_special_chars ) {
+	// Handle admin area context
+	if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		// Limit checks to specific admin pages
+		if ( ! $screen || ! in_array(
+			$screen->id,
+			array(
+				'profile',
+				'user-edit',
+				'setup-config',
+			),
+			true
+		) ) {
+			return $password; // Return original password if checks fail
+		}
+	}
+
+	// Handle admin-ajax.php context
+	if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+		$action = $_REQUEST['action'] ?? '';
+
+		// Allow checks for specific actions related to password generation
+		if ( ! in_array( $action, array( 'generate-password' ), true ) ) {
+			return $password;
+		}
+	}
+
+	// Handle REST API or frontend requests
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		$request_uri = $_SERVER['REQUEST_URI'] ?? '';
+
+		// Allow checks only during password reset or specific API endpoints
+		if ( strpos( $request_uri, '/wp-json/wp/v2/users/password-reset' ) === false &&
+			strpos( $request_uri, '/wp-login.php?action=lostpassword' ) === false ) {
+			return $password; // Return original password if checks fail
+		}
+	}
+
+	// Proceed with the original function logic
 	static $count = 1;
 
 	$is_secure = is_password_secure( $password );
 
-	// The password could not be confirmed as secure.
+	// The password could not be confirmed as secure
 	if ( is_wp_error( $is_secure ) ) {
 		return $password;
 	}
 
-	// If 3 attempts have been made, use the generated password.
+	// If 3 attempts have been made or the password is secure, return it
 	if ( $count > 3 || $is_secure ) {
 		return $password;
 	}
 
-	$count++;
-
+	// Increment the counter and regenerate the password
+	++$count;
 	return wp_generate_password( $length, $special_chars, $extra_special_chars );
 }
 add_filter( 'random_password', __NAMESPACE__ . '\random_password', 10, 4 );
