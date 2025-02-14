@@ -152,7 +152,7 @@ function admin_notices() {
 			<?php
 			printf(
 				/* translators: %s: Human-readable time interval. */
-				esc_html__( 'You will not see an insecure password notice for %s.', 'newfold' ),
+				esc_html__( 'You will not see an insecure password notice for %s.', 'wp-module-secure-passwords' ),
 				esc_html( human_time_diff( time() + NFD_REMIND_INTERVAL ) )
 			);
 			?>
@@ -198,7 +198,7 @@ function user_profile_update_errors( $errors, $update, $user ) {
 	} elseif ( ! $is_secure ) {
 		$errors->add(
 			'nfd_sp_insecure_password',
-			__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'newfold' )
+			__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'wp-module-secure-passwords' )
 		);
 	}
 }
@@ -358,5 +358,34 @@ function login_enqueue_scripts() {
 	wp_enqueue_script( 'nfd-secure-passwords', plugins_url( 'assets/js/secure-passwords.js', __FILE__ ), array( 'wp-util' ), NFD_SECURE_PASSWORD_MODULE_VERSION, true );
 
 	wp_enqueue_style( 'nfd-secure-passwords-login', plugins_url( 'assets/css/login.css', __FILE__ ), array(), NFD_SECURE_PASSWORD_MODULE_VERSION );
+
+	\wp_set_script_translations(
+		'nfd-secure-passwords',
+		'wp-module-secure-passwords',
+		NFD_SECURE_PASSWORDS_DIR . '/languages'
+	);
 }
 add_action( 'login_enqueue_scripts', __NAMESPACE__ . '\login_enqueue_scripts' );
+
+
+/**
+ * Load text domain for Module
+ *
+ * @return void
+ */
+function load_text_domain() {
+
+	\load_plugin_textdomain(
+		'wp-module-secure-passwords',
+		false,
+		NFD_SECURE_PASSWORDS_DIR . '/languages'
+	);
+
+	\load_script_textdomain(
+		'nfd-secure-passwords',
+		'wp-module-secure-passwords',
+		NFD_SECURE_PASSWORDS_DIR . '/languages'
+	);
+}
+
+\add_action( 'init', __NAMESPACE__ . '\load_text_domain', 100 );

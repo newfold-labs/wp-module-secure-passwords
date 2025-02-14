@@ -19,8 +19,11 @@ if ( function_exists( 'add_action' ) ) {
 			register(
 				[
 					'name'     => 'secure-passwords',
-					'label'    => __( 'Secure Passwords', 'newfold-secure-passwords' ),
+					'label'    => __( 'Secure Passwords', 'wp-module-secure-passwords' ),
 					'callback' => function ( Container $container ) {
+						if ( ! defined( 'NFD_SECURE_PASSWORDS_DIR' ) ) {
+							define( 'NFD_SECURE_PASSWORDS_DIR', __DIR__ );
+						}
 						require __DIR__ . '/secure-passwords.php';
 					},
 					'isActive' => true,
