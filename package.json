@@ -3,6 +3,10 @@
 	"description": "A module to secure passwords",
 	"license": "GPL-2.0-or-later",
 	"private": true,
+	"engines": {
+		"node": ">=22.11.0",
+		"npm": ">=10.9.0"
+	},
 	"author": {
 		"name": "Jonathan Desrosiers",
 		"email": "jonathan.desrosiers@newfold.com"
