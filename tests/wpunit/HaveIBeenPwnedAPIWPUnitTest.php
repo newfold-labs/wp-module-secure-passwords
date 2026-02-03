@@ -114,14 +114,18 @@ class HaveIBeenPwnedAPIWPUnitTest extends \lucatume\WPBrowser\TestCase\WPTestCas
 	/**
 	 * Verifies map_remove_counts returns first 35 characters (hash suffix without count).
 	 *
+	 * API format is "35-char-suffix:count"; implementation returns substr( $entry, 0, 35 ).
+	 * Input must have exactly 35 chars before the colon so the result does not include the count.
+	 *
 	 * @return void
 	 */
 	public function test_map_remove_counts_strips_count() {
 		$api = Have_I_Been_Pwned_API::init();
-		$in  = 'ABCDEF123456789012345678901234567:42';
+		// 35-char hash suffix (SHA1 suffix is 35 hex chars) then :count.
+		$in  = 'ABCDEF12345678901234567890123456789:42';
 		$out = $api->map_remove_counts( $in );
 		$this->assertSame( 35, strlen( $out ) );
-		$this->assertSame( substr( $in, 0, 35 ), $out );
+		$this->assertSame( 'ABCDEF12345678901234567890123456789', $out );
 		$this->assertStringNotContainsString( ':', $out );
 	}
 }
