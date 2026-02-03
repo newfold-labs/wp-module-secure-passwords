@@ -132,11 +132,16 @@ class FunctionsWPUnitTest extends \lucatume\WPBrowser\TestCase\WPTestCase {
 	}
 
 	/**
-	 * Verifies should_check_password returns false in local environment.
+	 * Verifies should_check_password returns false when environment is local.
+	 *
+	 * Skips in CI where wp_get_environment_type() is typically not 'local'.
 	 *
 	 * @return void
 	 */
 	public function test_should_check_password_returns_false_in_local() {
+		if ( wp_get_environment_type() !== 'local' ) {
+			$this->markTestSkipped( 'Only runs when wp_get_environment_type() is "local".' );
+		}
 		$this->assertFalse( should_check_password( $this->user_id ) );
 	}
 }

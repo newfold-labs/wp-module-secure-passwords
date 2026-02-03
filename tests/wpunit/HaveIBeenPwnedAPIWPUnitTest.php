@@ -112,13 +112,16 @@ class HaveIBeenPwnedAPIWPUnitTest extends \lucatume\WPBrowser\TestCase\WPTestCas
 	}
 
 	/**
-	 * Verifies map_remove_counts returns first 35 characters.
+	 * Verifies map_remove_counts returns first 35 characters (hash suffix without count).
 	 *
 	 * @return void
 	 */
 	public function test_map_remove_counts_strips_count() {
 		$api = Have_I_Been_Pwned_API::init();
-		$out = $api->map_remove_counts( 'ABCDEF123456789012345678901234567:42' );
-		$this->assertSame( 'ABCDEF123456789012345678901234567', $out );
+		$in  = 'ABCDEF123456789012345678901234567:42';
+		$out = $api->map_remove_counts( $in );
+		$this->assertSame( 35, strlen( $out ) );
+		$this->assertSame( substr( $in, 0, 35 ), $out );
+		$this->assertStringNotContainsString( ':', $out );
 	}
 }
