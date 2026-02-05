@@ -6,10 +6,12 @@
 	"repositories": [
 		{
 			"type": "composer",
+			"url": "https://wpackagist.org"
+		},
+		{
+			"type": "composer",
 			"url": "https://newfold-labs.github.io/satis/",
-			"only": [
-				"newfold-labs/*"
-			]
+			"only": ["newfold-labs/*"]
 		}
 	],
 	"authors": [
@@ -19,14 +21,14 @@
 		}
 	],
 	"autoload": {
-		"files": [
-			"bootstrap.php"
-		]
+		"files": ["bootstrap.php"]
 	},
 	"require-dev": {
-		"bluehost/wp-php-standards": "^1.1",
-		"wp-phpunit/wp-phpunit": "^5.9",
-		"yoast/phpunit-polyfills": "^1.0"
+		"newfold-labs/wp-php-standards": "@stable",
+		"newfold-labs/wp-module-loader": "^1.0",
+		"johnpbloch/wordpress": "@stable",
+		"lucatume/wp-browser": "*",
+		"phpunit/phpcov": "*"
 	},
 	"scripts": {
 		"fix": [
@@ -34,15 +36,28 @@
 		],
 		"lint": [
 			"vendor/bin/phpcs . --standard=Bluehost -s"
-		]
+		],
+		"test": "codecept run wpunit",
+		"test-coverage": "codecept run wpunit --coverage wpunit.cov && phpcov merge --php tests/_output/merged.cov --html tests/_output/html tests/_output && echo \"open tests/_output/html/index.html to view the report\""
 	},
 	"scripts-descriptions": {
 		"fix": "Automatically fix coding standards issues where possible.",
-		"lint": "Check files against coding standards."
+		"lint": "Check files against coding standards.",
+		"test": "Run wpunit tests.",
+		"test-coverage": "Run wpunit tests with coverage."
 	},
 	"config": {
+		"platform": {
+			"php": "7.4.33"
+		},
+		"preferred-install": {
+			"newfold-labs/*": "source",
+			"*": "dist"
+		},
 		"allow-plugins": {
-			"dealerdirect/phpcodesniffer-composer-installer": true
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"composer/installers": true,
+			"johnpbloch/wordpress-core-installer": true
 		}
 	}
 }
