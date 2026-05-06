@@ -14,31 +14,31 @@ if ( ! empty( $_REQUEST['redirect_to'] ) ) {
 	$redirect_to = admin_url();
 }
 
-login_header( esc_html__( 'Insecure password detected', 'newfold' ), '', $errors );
+login_header( esc_html__( 'Insecure password detected', 'wp-module-secure-passwords' ), '', $errors );
 
 ?>
 	<form class="sp-insecure-password-form" name="sp-insecure-password-form" action="<?php echo esc_url( get_edit_user_link() ); ?>" method="post">
 		<input type="hidden" name="redirect_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
 
 		<h1 class="admin-email__heading">
-			<?php esc_html_e( 'Insecure password detected', 'newfold' ); ?>
+			<?php esc_html_e( 'Insecure password detected', 'wp-module-secure-passwords' ); ?>
 		</h1>
 
 		<p class="admin-email__details">
-			<strong><?php esc_html_e( 'This does not mean your user account or WordPress site has been compromised.', 'newfold' ); ?></strong>
+			<strong><?php esc_html_e( 'This does not mean your user account or WordPress site has been compromised.', 'wp-module-secure-passwords' ); ?></strong>
 		</p>
 
 		<p class="admin-email__details">
-			<?php esc_html_e( 'The password you are using was found in a database of insecure passwords. This likely means that that it was part of a previously reported data breach, making it much more likely to be used in attempts by bad actors to compromise sites.', 'newfold' ); ?>
+			<?php esc_html_e( 'The password you are using was found in a database of insecure passwords. This likely means that that it was part of a previously reported data breach, making it much more likely to be used in attempts by bad actors to compromise sites.', 'wp-module-secure-passwords' ); ?>
 		</p>
 
 		<p class="admin-email__details">
-			<strong><?php esc_html_e( 'It is strongly recommended that you change your password.', 'newfold' ); ?></strong>
+			<strong><?php esc_html_e( 'It is strongly recommended that you change your password.', 'wp-module-secure-passwords' ); ?></strong>
 		</p>
 
 		<div class="admin-email__actions">
 			<div class="admin-email__actions-primary">
-				<input type="submit" name="update-password" id="update-password" class="button button-primary button-large" value="<?php esc_attr_e( 'Change password', 'newfold' ); ?>" />
+				<input type="submit" name="update-password" id="update-password" class="button button-primary button-large" value="<?php esc_attr_e( 'Change password', 'wp-module-secure-passwords' ); ?>" />
 			</div>
 
 			<div class="admin-email__actions-secondary">
@@ -54,7 +54,7 @@ login_header( esc_html__( 'Insecure password detected', 'newfold' ), '', $errors
 				);
 
 				?>
-				<a href="<?php echo esc_url( $remind_me_link ); ?>"><?php esc_html_e( 'Remind me later', 'newfold' ); ?></a>
+				<a href="<?php echo esc_url( $remind_me_link ); ?>"><?php esc_html_e( 'Remind me later', 'wp-module-secure-passwords' ); ?></a>
 			</div>
 		</div>
 	</form>

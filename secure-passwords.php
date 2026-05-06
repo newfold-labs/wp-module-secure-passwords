@@ -152,7 +152,7 @@ function admin_notices() {
 			<?php
 			printf(
 				/* translators: %s: Human-readable time interval. */
-				esc_html__( 'You will not see an insecure password notice for %s.', 'newfold' ),
+				esc_html__( 'You will not see an insecure password notice for %s.', 'wp-module-secure-passwords' ),
 				esc_html( human_time_diff( time() + NFD_REMIND_INTERVAL ) )
 			);
 			?>
@@ -198,7 +198,7 @@ function user_profile_update_errors( $errors, $update, $user ) {
 	} elseif ( ! $is_secure ) {
 		$errors->add(
 			'nfd_sp_insecure_password',
-			__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'newfold' )
+			__( 'Please choose a different password. The one entered was found in a database of insecure passwords.', 'wp-module-secure-passwords' )
 		);
 	}
 }
