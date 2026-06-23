@@ -21,8 +21,8 @@ jobs:
     name: 'Check and update translations'
     uses: newfold-labs/workflows/.github/workflows/reusable-translations.yml@main
     permissions:
-      contents: write       # Required for reusable workflow to commit updated translation files.
-      pull-requests: write  # Required for reusable workflow to open or update translation PRs.
+      contents: write      # Required for reusable workflow to commit updated translation files.
+      pull-requests: write # Required for reusable workflow to open or update translation PRs.
     timeout-minutes: 30
     with:
       text_domain: 'wp-module-secure-passwords'
