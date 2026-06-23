@@ -18,8 +18,7 @@ jobs:
   setup:
     name: Setup
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+permissions: {}
     timeout-minutes: 5
     outputs:
       branch: ${{ steps.extract_branch.outputs.branch }}
