@@ -8,6 +8,6 @@ return [
 	'po-revision-date' => '2026-04-03T19:13:34+00:00',
 	'x-generator' => 'WP-CLI 2.12.0',
 	'messages' => [
-,
+		'Secure Passwords' => 'Veilige wachtwoorden',
 	],
 ];
